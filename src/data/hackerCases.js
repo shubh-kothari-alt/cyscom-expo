@@ -9,7 +9,6 @@ export function getRandomCase() {
         name: "WALTER",
         role: "CHEMISTRY CONSULTANT",
         image: "/walt.jpg",
-        image: null, 
         alibi: "Claimed to be managing the cash register at the A1A Car Wash from 11:00 PM to 1:00 AM.",
         clues: "Database logs show an authorized override code was used. Walter was seen near Gus's admin terminal earlier that day."
       },
