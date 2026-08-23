@@ -1,40 +1,34 @@
-import { ShieldAlert } from "lucide-react";
-import { BRAND, CIPHER_CASE_URL } from "../config";
+import { ArrowRight } from "lucide-react";
 
-export default function CipherCaseBanner({ variant = "landing" }) {
-  const isEnd = variant === "end";
-  
+export default function CipherCaseBanner({ variant = "default" }) {
   return (
-    <div className="hud-frame relative overflow-hidden border border-crimson/30 bg-gradient-to-br from-wine/80 via-panel2/80 to-void/80 backdrop-blur-md p-6 text-bone shadow-glowMaroon md:p-8">
-      {/* Subtle glowing ambient light in the corner */}
-      <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-crimson/20 blur-3xl" />
-      
-      <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 font-mono text-xs tracking-[0.3em] text-crimson">
-            <ShieldAlert size={14} className="drop-shadow-md" />
-            POWERED BY {BRAND.org}
-          </div>
-          <p className="font-mono text-xs uppercase tracking-widest text-mute">
-            {isEnd ? "You've survived the arcade. Ready for the real case?" : "The real case starts here."}
-          </p>
-          <h3 className="mt-2 font-display text-3xl font-bold tracking-tight text-bone md:text-4xl drop-shadow-sm">
-            {BRAND.event}
-          </h3>
-          <p className="font-mono text-sm tracking-widest text-crimson/80">{BRAND.ctfLength}</p>
+    <a
+      href="https://chennaievents.vit.ac.in/technovit/eventPreview"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`group relative flex items-center justify-between overflow-hidden border border-white/10 bg-white/5 p-6 transition-all hover:bg-white/10 hover:border-white/20 active:scale-[0.99] cursor-pointer ${
+        variant === "landing" ? "w-full" : ""
+      }`}
+    >
+      {/* Matrix-style aesthetic accent */}
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-600 opacity-80 group-hover:bg-red-500 transition-colors" />
+
+      <div className="flex flex-col gap-1 pl-2">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-red-600 animate-pulse"></span>
+          <p className="text-[10px] font-mono tracking-[0.2em] text-white/50">TECHNOVIT EVENT</p>
         </div>
-        
-        <a
-          href={CIPHER_CASE_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="group relative overflow-hidden hud-frame shrink-0 border border-crimson/50 bg-crimson/10 px-6 py-3 text-center font-display text-sm font-semibold tracking-widest text-crimson transition-all duration-300 hover:border-crimson hover:bg-crimson/20 hover:shadow-glowCrimson"
-        >
-          <span className="relative z-10">{isEnd ? "SCAN TO REGISTER" : "LEARN MORE"}</span>
-          {/* Animated gradient sweep on hover */}
-          <div className="absolute inset-0 -z-0 bg-gradient-to-r from-transparent via-crimson/20 to-transparent translate-x-[-100%] transition-transform duration-700 group-hover:translate-x-[100%]" />
-        </a>
+        <h3 className="text-xl font-display font-bold tracking-widest text-white group-hover:text-red-400 transition-colors">
+          CIPHER CASE
+        </h3>
+        <p className="text-sm font-mono text-white/60">
+          Register now for the ultimate cyber showdown.
+        </p>
       </div>
-    </div>
+
+      <div className="flex items-center justify-center rounded-full bg-white/5 p-3 group-hover:bg-red-600/20 group-hover:text-red-400 transition-all text-white/40">
+        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+      </div>
+    </a>
   );
 }
