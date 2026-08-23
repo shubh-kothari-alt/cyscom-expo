@@ -9,6 +9,7 @@ import NameEntry from "./components/NameEntry";
 import PhishOrFish from "./games/PhishOrFish/PhishOrFish";
 import PasswordPanic from "./games/PasswordPanic/PasswordPanic";
 import WhosTheHacker from "./games/WhosTheHacker/WhosTheHacker";
+import CipherCaseGame from "./games/CipherCaseGame/CipherCaseGame"; // <-- Imported the new game
 import { EXPO_TIMEOUT } from "./config";
 import {
   getPlayerName,
@@ -18,10 +19,12 @@ import {
   getCombinedScore,
 } from "./utils/storage";
 
+// Added cipher to the game metadata
 const GAME_META = {
   phish: { title: "PHISH OR FISH?" },
   password: { title: "PASSWORD PANIC" },
   hacker: { title: "WHO'S THE HACKER?" },
+  cipher: { title: "CIPHER CASE CTF" }, 
 };
 
 export default function App() {
@@ -31,7 +34,6 @@ export default function App() {
   const [expoMode, setExpoMode] = useState(false);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   
-  // Update state to handle async Supabase data
   const [entries, setEntries] = useState([]);
   const [combinedScore, setCombinedScore] = useState(0);
 
@@ -39,7 +41,6 @@ export default function App() {
   const viewRef = useRef(view);
   viewRef.current = view;
 
-  // Fetch initial leaderboard and player score on load
   useEffect(() => {
     async function loadData() {
       const board = await getLeaderboard();
@@ -94,20 +95,19 @@ export default function App() {
   function handleClearName() {
     setPlayerNameState("");
     savePlayerName("");
-    setCombinedScore(0); // Reset score when switching profiles
+    setCombinedScore(0);
   }
 
-  // Update handler to wait for the database
   async function handleComplete(game, score) {
     const updated = await addLeaderboardEntry({ nickname: playerName || "PLAYER", score, game });
     setEntries(updated);
     
-    // Update landing page score
     const newCombined = await getCombinedScore(playerName);
     setCombinedScore(newCombined);
   }
 
-  const isGame = ["phish", "password", "hacker"].includes(view);
+  // Added cipher to the isGame check so the header and background adapt!
+  const isGame = ["phish", "password", "hacker", "cipher"].includes(view);
   function handleBack() {
     if (isGame) setView("arcade");
     else if (view === "arcade") setView("landing");
@@ -116,7 +116,6 @@ export default function App() {
   return (
     <div className="relative min-h-screen font-body text-bone selection:bg-white/30 selection:text-white bg-[#0a0a0c]">
       
-      {/* Global Dyson Sphere Background */}
       {(!isGame || view === "arcade" || view === "landing") && <StructuralBackground />}
       
       <Header
@@ -178,6 +177,19 @@ export default function App() {
               <WhosTheHacker soundOn={soundOn} onExit={handleBack} onComplete={(score) => handleComplete("hacker", score)} />
             </motion.div>
           )}
+          
+          {/* Render the new Cipher Case game! */}
+          {view === "cipher" && (
+            <motion.div key="cipher" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <CipherCaseGame 
+                onComplete={(score) => {
+                  handleComplete("cipher", score);
+                  // Automatically send them back to the menu after 4 seconds of seeing the success screen
+                  setTimeout(() => setView("arcade"), 4000); 
+                }} 
+              />
+            </motion.div>
+          )}
         </AnimatePresence>
       </main>
 
@@ -192,27 +204,23 @@ export default function App() {
 }
 
 // ==========================================
-// AESTHETIC PLAIN BACKGROUND (With 3D Rotating Dyson Sphere)
+// AESTHETIC PLAIN BACKGROUND
 // ==========================================
 function StructuralBackground() {
   return (
     <div className="fixed inset-0 -z-0 bg-[#0a0a0c] overflow-hidden flex items-center justify-center pointer-events-none">
-      {/* 1. Precision Grid Lines */}
       <div className="absolute left-[15%] top-0 bottom-0 w-[1px] bg-white/[0.03]" />
       <div className="absolute right-[15%] top-0 bottom-0 w-[1px] bg-white/[0.03]" />
       <div className="absolute top-[25%] left-0 right-0 h-[1px] bg-white/[0.03]" />
       <div className="absolute bottom-[25%] left-0 right-0 h-[1px] bg-white/[0.03]" />
 
-      {/* 2. Crosshairs at Intersections */}
       <div className="absolute top-[25%] left-[15%] -translate-x-1/2 -translate-y-1/2 text-white/10"><Plus size={16} strokeWidth={1} /></div>
       <div className="absolute top-[25%] right-[15%] translate-x-1/2 -translate-y-1/2 text-white/10"><Plus size={16} strokeWidth={1} /></div>
       <div className="absolute bottom-[25%] left-[15%] -translate-x-1/2 translate-y-1/2 text-white/10"><Plus size={16} strokeWidth={1} /></div>
       <div className="absolute bottom-[25%] right-[15%] translate-x-1/2 translate-y-1/2 text-white/10"><Plus size={16} strokeWidth={1} /></div>
 
-      {/* 3. The True 3D Rotating Dyson Sphere */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] pointer-events-none flex items-center justify-center" style={{ perspective: "1200px" }}>
         
-        {/* Central Logo (Static) */}
         <div className="absolute z-20 w-[300px] h-[300px] flex items-center justify-center opacity-40">
           <img 
             src="/logo1.png" 
@@ -221,7 +229,6 @@ function StructuralBackground() {
           />
         </div>
 
-        {/* Inner Dyson Sphere */}
         <motion.div
           className="absolute w-[500px] h-[500px]"
           style={{ transformStyle: "preserve-3d" }}
@@ -234,7 +241,6 @@ function StructuralBackground() {
           <div className="absolute inset-0 rounded-full border-2 border-blue-400/30" style={{ transform: "rotateX(90deg) rotateY(135deg)" }} />
         </motion.div>
 
-        {/* Middle Independent Orbit Ring */}
         <motion.div
           className="absolute w-[650px] h-[650px] rounded-full border-2 border-blue-500/25"
           style={{ transformStyle: "preserve-3d" }}
@@ -242,7 +248,6 @@ function StructuralBackground() {
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
         
-        {/* Outer Independent Orbit Ring */}
         <motion.div
           className="absolute w-[750px] h-[750px] rounded-full border-2 border-white/20 border-dashed"
           style={{ transformStyle: "preserve-3d" }}
@@ -260,7 +265,6 @@ function StructuralBackground() {
 function LandingScreen({ playerName, onSetName, onClearName, combinedScore, onEnter }) {
   return (
     <div className="relative flex min-h-[85vh] flex-col items-center justify-center p-6 z-10">
-      
       <div className="w-full max-w-md relative z-10 mb-12">
         {!playerName ? (
           <div className="flex flex-col text-left">
@@ -271,7 +275,6 @@ function LandingScreen({ playerName, onSetName, onClearName, combinedScore, onEn
           </div>
         ) : (
           <div className="flex flex-col text-left">
-            
             <div className="mb-12">
               <p className="text-white/40 font-mono tracking-widest text-[10px] uppercase mb-3">Active Session</p>
               <h1 className="font-display text-4xl font-bold text-white tracking-tight break-all">
@@ -311,12 +314,13 @@ function LandingScreen({ playerName, onSetName, onClearName, combinedScore, onEn
 }
 
 // ==========================================
-// SCREEN 2: ARCADE DASHBOARD (Classic Grid)
+// SCREEN 2: ARCADE DASHBOARD
 // ==========================================
 function ArcadeDashboard({ onPlay }) {
   return (
     <div className="flex flex-col gap-10 pt-4">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Added the CTF game to the grid! */}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
         <GameCard
           title="PHISH OR FISH?"
           description="Spot the social engineering attempts before time runs out."
@@ -331,6 +335,11 @@ function ArcadeDashboard({ onPlay }) {
           title="WHO'S THE HACKER?"
           description="Review dossiers and identify the internal threat."
           onClick={() => onPlay("hacker")}
+        />
+        <GameCard
+          title="CIPHER CASE CTF"
+          description="A lethal CTF challenge. Find the atomic connections to decrypt the terminal."
+          onClick={() => onPlay("cipher")}
         />
       </div>
       
